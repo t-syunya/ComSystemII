@@ -22,21 +22,21 @@
 #define REAL double		/* Data Size: double(default) -> ON */
 #endif
 
-#define BLOCKING		/* blocking -> ON */
+//#define BLOCKING		/* blocking -> ON */
 //#define AVX2			/* Intel AVX2-> ON */
 //#define AVX512			/* Intel AVX512 -> ON */
 //#define AVX512_UNROLL		/* Intel AVX512 & UNROLL -> ON */
-#define OMP                           /* OpenMP -> ON */
-#define AVX_OMP                       /* Intel AVX + OpenMP -> ON */
+//#define OMP                           /* OpenMP -> ON */
+//#define AVX_OMP                       /* Intel AVX + OpenMP -> ON */
 //#define AVX512_BLOCKING		/* Intel AVX512 & blocking -> ON */
 //#define AVX512_UNROLL_BLOCKING	/* Intel AVX512 & UNROLL & blocking -> ON */
-#define AVX512_UNROLL_BLOCKING_OMP	/* Intel AVX512 & UNROLL & blocking & OMP -> ON */
+//#define AVX512_UNROLL_BLOCKING_OMP	/* Intel AVX512 & UNROLL & blocking & OMP -> ON */
 //#define BLOCKING_OMP          /* blocking + OpenMP -> ON */
 //#define BLOCKING_OMP2         /* blocking + OpenMP(2places) -> ON */
 //#define BLOCKING_AVX_OMP              /* blocking + Intel AVX + OpenMP -> ON */
 //#define BLOCKING_AVX_OMP2             /* blocking + Intel AVX + OpenMP(2places) -> ON */
 
-#define MKL
+//#define MKL
 
 
 /* Unoptimized */
