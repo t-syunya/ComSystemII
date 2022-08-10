@@ -31,10 +31,6 @@
 //#define AVX512_BLOCKING		/* Intel AVX512 & blocking -> ON */
 //#define AVX512_UNROLL_BLOCKING	/* Intel AVX512 & UNROLL & blocking -> ON */
 //#define AVX512_UNROLL_BLOCKING_OMP	/* Intel AVX512 & UNROLL & blocking & OMP -> ON */
-//#define BLOCKING_OMP          /* blocking + OpenMP -> ON */
-//#define BLOCKING_OMP2         /* blocking + OpenMP(2places) -> ON */
-//#define BLOCKING_AVX_OMP              /* blocking + Intel AVX + OpenMP -> ON */
-//#define BLOCKING_AVX_OMP2             /* blocking + Intel AVX + OpenMP(2places) -> ON */
 
 //#define MKL
 
@@ -352,50 +348,6 @@ main (int argc, char *argv[])
 	      (float) N * N * N * 2 / t / 1000 / 1000 / 1000);
 #endif
 
-
-      /*blocking+OMP */
-#ifdef BLOCKING_OMP
-      int_mat (A, B, C, N);
-      t = seconds ();
-      dgemm_blocking_OMP (A, B, C, N);
-      t = seconds () - t;
-      check_mat (C, C_unopt, N);
-      printf ("%f [s]  GFLOPS %f  |blocking+OMP|\n", t,
-	      (float) N * N * N * 2 / t / 1000 / 1000 / 1000);
-#endif
-
-      /*blocking+OMP2 */
-#ifdef BLOCKING_OMP2
-      int_mat (A, B, C, N);
-      t = seconds ();
-      dgemm_blocking_OMP2 (A, B, C, N);
-      t = seconds () - t;
-      check_mat (C, C_unopt, N);
-      printf ("%f [s]  GFLOPS %f  |blocking+OMP2|\n", t,
-	      (float) N * N * N * 2 / t / 1000 / 1000 / 1000);
-#endif
-
-      /*blocking+AVX+OMP */
-#ifdef BLOCKING_AVX_OMP
-      int_mat (A, B, C, N);
-      t = seconds ();
-      dgemm_blocking_AVX_OMP (A, B, C, N);
-      t = seconds () - t;
-      check_mat (C, C_unopt, N);
-      printf ("%f [s]  GFLOPS %f  |blocking+AVX+OMP|\n", t,
-	      (float) N * N * N * 2 / t / 1000 / 1000 / 1000);
-#endif
-
-      /*blocking+AVX+OMP2 */
-#ifdef BLOCKING_AVX_OMP2
-      int_mat (A, B, C, N);
-      t = seconds ();
-      dgemm_blocking_AVX_OMP2 (A, B, C, N);
-      t = seconds () - t;
-      check_mat (C, C_unopt, N);
-      printf ("%f [s]  GFLOPS %f  |blocking+AVX+OMP2|\n", t,
-	      (float) N * N * N * 2 / t / 1000 / 1000 / 1000);
-#endif
 
 #ifdef MKL
       int_mat (A, B, C, N);
