@@ -23,11 +23,11 @@
 ### TUT IMCの広域連携教育研究用クラスタシステム
 学内ネットワーク環境からは以下のようにsshで学内のアカウント(無線LANを使うときのIDとPW)で利用できます。学外からは、VPNで繋いでからsshすると利用できます。
 ```
-% ssh xdev.edu.tut.ac.jp
+ssh xdev.edu.tut.ac.jp
 ```
 - ログイン後、git cloneのコマンドにて課題のサンプルプログラムをコピーし、以下をコマンドを実行し、計算サーバーに移動して、プログラムを実行すること。
 ```
-% qsub -I -q wEduq -l select=1:ncpus=4 -v SINGULARITY_IMAGE=prg-env:latest
+qsub -I -q wEduq -l select=1:ncpus=4 -v SINGULARITY_IMAGE=prg-env:latest
 ```
 - qsubコマンド実行後、Singularityが起動し、コマンドプロンプトが返ってきたら、`make; make run`で実験できます。
   - `qsub –I –l select…` が紛らわしいのですが、最初が大文字のiで、セレクトの前が小文字のLです。
@@ -45,11 +45,13 @@
 
 2025年6月から稼働したAMD社のCPUを搭載したクラスタでの実行方法
 ```
-% ssh ydev.edu.tut.ac.jp
+ssh ydev.edu.tut.ac.jp
 ```
 - ログイン後、git cloneのコマンドにて課題のサンプルプログラムをコピーし、以下をコマンドを実行し、計算サーバーに移動して、プログラムを実行すること。
 ```
-% qsub -I -q Eduq -l select=1:ncpus=4:mem=16gb /bin/bash
+qsub -I -q Eduq -l select=1:ncpus=4:mem=16gb /bin/bash
+ . /etc/profile
+ module load intel/2025
 ```
 - Intel Compilerは、icxとなります。
 - qsubコマンド実行後、Singularityが起動し、コマンドプロンプトが返ってきたら、`make; make run`で実験できます。
