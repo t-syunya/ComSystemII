@@ -10,7 +10,6 @@
 
 ### gemm-test.cは、様々なソフトウェアレベルの最適化がなされた行列行列積を求める関数が記載されたプログラム
 - Makefile で標準的な環境でコンパイルできるようになっている
-- OpenMPのライブラリがない場合は、[IMC HPCクラスタ](https://hpcportal.imc.tut.ac.jp/wiki/)を使うと便利。詳細は後述。
 - 行列サイズと反復数(試行数)を引数とする
 - #ifdefにより、どのような最適化をしたコードを実行するかを決定する
   - ソースコードの先頭付近にある#define文のコメントを外すと最適化を適用したものを計測できる
@@ -42,4 +41,4 @@
 - コンパイラとして、Intel Compiler (icc)が使えるようになります。
 - CPUなどの情報は`% lscpu`とすると、OSが認識しているCPUの情報などが表示されます。OSは`% less /etc/redhat-release`にて表示されます。
   - xdevで実行したqsubで割り当てられたサーバー章で動いているコンテナに関する情報が表示される。
-  - その他の事項は、適宜、[IMC HPCクラスタのwiki](https://hpcportal.imc.tut.ac.jp/wiki/)をご覧ください。
+- [IMC HPCクラスタのwiki](https://hpcportal.imc.tut.ac.jp/wiki/)にある情報は、2025年6月から稼働しているydevというAMDのCPUを持つマシン向けの情報なので、必ずしも上記のドキュメントの操作ができるとも限りません。
