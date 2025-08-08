@@ -41,4 +41,17 @@
 - コンパイラとして、Intel Compiler (icc)が使えるようになります。
 - CPUなどの情報は`% lscpu`とすると、OSが認識しているCPUの情報などが表示されます。OSは`% less /etc/redhat-release`にて表示されます。
   - xdevで実行したqsubで割り当てられたサーバー章で動いているコンテナに関する情報が表示される。
-- [IMC HPCクラスタのwiki](https://hpcportal.imc.tut.ac.jp/wiki/)にある情報は、2025年6月から稼働しているydevというAMDのCPUを持つマシン向けの情報なので、必ずしも上記のドキュメントの操作ができるとも限りません。
+
+
+2025年6月から稼働したAMD社のCPUを搭載したクラスタでの実行方法
+```
+% ssh ydev.edu.tut.ac.jp
+```
+- ログイン後、git cloneのコマンドにて課題のサンプルプログラムをコピーし、以下をコマンドを実行し、計算サーバーに移動して、プログラムを実行すること。
+```
+% qsub -I -q Eduq -l select=1:ncpus=4:mem=16gb /bin/bash
+```
+- Intel Compilerは、icxとなります。
+- qsubコマンド実行後、Singularityが起動し、コマンドプロンプトが返ってきたら、`make; make run`で実験できます。
+- スレッド数の指定は、`export OMP_NUM_THREADS=4; make run`　あるいは　`make run -e OMP_NUM_THREADS=4`
+- 詳しくは[IMC HPCクラスタのwiki](https://hpcportal.imc.tut.ac.jp/wiki/)にある情報を参照ください。
