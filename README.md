@@ -28,9 +28,9 @@
 ```
 - ログイン後、git cloneのコマンドにて課題のサンプルプログラムをコピーし、以下をコマンドを実行し、計算サーバーに移動して、プログラムを実行すること。
 ```
-% qsub -I -q wEduq -l select=1:ncpus=4 -v DOCKER_IMAGE=prg-env:latest
+% qsub -I -q wEduq -l select=1:ncpus=4 -v SINGULARITY_IMAGE=prg-env:latest
 ```
-- qsubコマンド実行後、Dockerが起動し、コマンドプロンプトが返ってきたら、`make; make run`で実験できます。
+- qsubコマンド実行後、Singularityが起動し、コマンドプロンプトが返ってきたら、`make; make run`で実験できます。
   - `qsub –I –l select…` が紛らわしいのですが、最初が大文字のiで、セレクトの前が小文字のLです。
   - qsubとは計算機のリソースを管理して共有して使えるようにしているツールなので、リソースがその時に使えるものがないと待ち時間が発生します。
       - そのままの状態で待っていると、リソースが使えるようになったタイミングでコマンドプロンプトが戻ってきます。
@@ -39,7 +39,7 @@
         - qsubで実行するコマンドをスクリプトとして用意し、qsub実行時にスクリプトを読み込み、空きがある段階で実行されて結果をファイルで書き戻す。
   - スレッド数の指定は、`export OMP_NUM_THREADS=4; make run`　あるいは　`make run -e OMP_NUM_THREADS=4`
     - IMCのxdevから利用する計算サーバーは、教育向け用途では4コアまでの利用に限定されている。デフォルトでOMP_NUM_THREADS=4が設定されるようだ。
-- コンパイラとして、Intel Compiler (icc)も使えるようになります。
+- コンパイラとして、Intel Compiler (icc)が使えるようになります。
 - CPUなどの情報は`% lscpu`とすると、OSが認識しているCPUの情報などが表示されます。OSは`% less /etc/redhat-release`にて表示されます。
   - xdevで実行したqsubで割り当てられたサーバー章で動いているコンテナに関する情報が表示される。
   - その他の事項は、適宜、[IMC HPCクラスタのwiki](https://hpcportal.imc.tut.ac.jp/wiki/)をご覧ください。
