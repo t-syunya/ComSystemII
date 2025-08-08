@@ -43,7 +43,7 @@ qsub -I -q wEduq -l select=1:ncpus=4 -v SINGULARITY_IMAGE=prg-env:latest
   - xdevで実行したqsubで割り当てられたサーバー章で動いているコンテナに関する情報が表示される。
 
 
-2025年6月から稼働したAMD社のCPUを搭載したクラスタでの実行方法
+** 2025年6月から稼働したAMD社のCPUを搭載したクラスタでの実行方法
 ```
 ssh ydev.edu.tut.ac.jp
 ```
@@ -53,7 +53,7 @@ qsub -I -q Eduq -l select=1:ncpus=4 /bin/bash
 . /etc/profile
 module load intel/2025
 ```
-- Intel Compilerは、icxとなります。
+- コンパイラはgccを使う場合のみ動作を確認しております。Intel Compilerは、CC=icxとなりますが、うまく動かないようです。
 - qsubコマンド実行後、Singularityが起動し、コマンドプロンプトが返ってきたら、`make; make run`で実験できます。
 - スレッド数の指定は、`export OMP_NUM_THREADS=4; make run`　あるいは　`make run -e OMP_NUM_THREADS=4`
 - 詳しくは[IMC HPCクラスタのwiki](https://hpcportal.imc.tut.ac.jp/wiki/)にある情報を参照ください。
