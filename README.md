@@ -49,9 +49,9 @@ ssh ydev.edu.tut.ac.jp
 ```
 - ログイン後、git cloneのコマンドにて課題のサンプルプログラムをコピーし、以下をコマンドを実行し、計算サーバーに移動して、プログラムを実行すること。
 ```
-qsub -I -q Eduq -l select=1:ncpus=4:mem=16gb /bin/bash
- . /etc/profile
- module load intel/2025
+qsub -I -q Eduq -l select=1:ncpus=4 /bin/bash
+. /etc/profile
+module load intel/2025
 ```
 - Intel Compilerは、icxとなります。
 - qsubコマンド実行後、Singularityが起動し、コマンドプロンプトが返ってきたら、`make; make run`で実験できます。
