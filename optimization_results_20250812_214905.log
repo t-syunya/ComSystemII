@@ -1,0 +1,861 @@
+
+[1;34m=== 基本テスト（最適化なし） ===[0m
+rm -f *.o gemm-test
+icc -qopenmp -O3 -xCORE-AVX512 -g -c gemm-test.c
+icc -o gemm-test gemm-test.o -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread -lm
+[1;36mℹ 基本テスト実行中...[0m
+taskset -c 0-$((4-1)) ./gemm-test 960 10
+data_size : double(default)
+array size N = 960
+blocking size = 32
+The number of threads= 4
+iterations = 10
+
+0.114094 [s]  GFLOPS 15.508902  |unoptimized| 
+0.113026 [s]  GFLOPS 15.655441  |loop exchange| 
+
+0.113266 [s]  GFLOPS 15.622283  |unoptimized| 
+0.113173 [s]  GFLOPS 15.635092  |loop exchange| 
+
+0.112835 [s]  GFLOPS 15.681945  |unoptimized| 
+0.112996 [s]  GFLOPS 15.659600  |loop exchange| 
+
+0.112827 [s]  GFLOPS 15.683058  |unoptimized| 
+0.112944 [s]  GFLOPS 15.666795  |loop exchange| 
+
+0.112897 [s]  GFLOPS 15.673344  |unoptimized| 
+0.112963 [s]  GFLOPS 15.664165  |loop exchange| 
+
+0.112975 [s]  GFLOPS 15.662502  |unoptimized| 
+0.112875 [s]  GFLOPS 15.676372  |loop exchange| 
+
+0.113415 [s]  GFLOPS 15.601732  |unoptimized| 
+0.113027 [s]  GFLOPS 15.655308  |loop exchange| 
+
+0.114337 [s]  GFLOPS 15.475921  |unoptimized| 
+0.112877 [s]  GFLOPS 15.676108  |loop exchange| 
+
+0.112800 [s]  GFLOPS 15.686813  |unoptimized| 
+0.112985 [s]  GFLOPS 15.661116  |loop exchange| 
+
+0.112765 [s]  GFLOPS 15.691662  |unoptimized| 
+0.112920 [s]  GFLOPS 15.670136  |loop exchange| 
+[1;32m✓ 基本テスト完了[0m
+
+[1;34m=== ブロッキングテスト ===[0m
+[1;36mℹ ブロックサイズ: 16[0m
+rm -f *.o gemm-test
+icc -qopenmp -O3 -xCORE-AVX512 -g -c gemm-test.c
+icc -o gemm-test gemm-test.o -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread -lm
+[1;36mℹ ブロッキングテスト実行中（ブロックサイズ: 16）...[0m
+taskset -c 0-$((4-1)) ./gemm-test 960 10
+data_size : double(default)
+array size N = 960
+blocking size = 16
+The number of threads= 4
+iterations = 10
+
+0.112032 [s]  GFLOPS 15.794328  |unoptimized| 
+0.111497 [s]  GFLOPS 15.870132  |loop exchange| 
+
+0.111303 [s]  GFLOPS 15.897798  |unoptimized| 
+0.111318 [s]  GFLOPS 15.895642  |loop exchange| 
+
+0.111274 [s]  GFLOPS 15.901920  |unoptimized| 
+0.111468 [s]  GFLOPS 15.874260  |loop exchange| 
+
+0.111459 [s]  GFLOPS 15.875553  |unoptimized| 
+0.111440 [s]  GFLOPS 15.878241  |loop exchange| 
+
+0.111496 [s]  GFLOPS 15.870270  |unoptimized| 
+0.111412 [s]  GFLOPS 15.882231  |loop exchange| 
+
+0.111431 [s]  GFLOPS 15.879526  |unoptimized| 
+0.111327 [s]  GFLOPS 15.894361  |loop exchange| 
+
+0.111525 [s]  GFLOPS 15.866160  |unoptimized| 
+0.111393 [s]  GFLOPS 15.884960  |loop exchange| 
+
+0.112506 [s]  GFLOPS 15.727817  |unoptimized| 
+0.112344 [s]  GFLOPS 15.750487  |loop exchange| 
+
+0.111388 [s]  GFLOPS 15.885647  |unoptimized| 
+0.111247 [s]  GFLOPS 15.905801  |loop exchange| 
+
+0.111362 [s]  GFLOPS 15.889386  |unoptimized| 
+0.111243 [s]  GFLOPS 15.906358  |loop exchange| 
+[1;32m✓ ブロックサイズ 16 のテスト完了[0m
+[1;36mℹ ブロックサイズ: 32[0m
+rm -f *.o gemm-test
+icc -qopenmp -O3 -xCORE-AVX512 -g -c gemm-test.c
+icc -o gemm-test gemm-test.o -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread -lm
+[1;36mℹ ブロッキングテスト実行中（ブロックサイズ: 32）...[0m
+taskset -c 0-$((4-1)) ./gemm-test 960 10
+data_size : double(default)
+array size N = 960
+blocking size = 32
+The number of threads= 4
+iterations = 10
+
+0.111520 [s]  GFLOPS 15.866862  |unoptimized| 
+0.111108 [s]  GFLOPS 15.925704  |loop exchange| 
+
+0.111213 [s]  GFLOPS 15.910648  |unoptimized| 
+0.111481 [s]  GFLOPS 15.872411  |loop exchange| 
+
+0.111438 [s]  GFLOPS 15.878544  |unoptimized| 
+0.111696 [s]  GFLOPS 15.841858  |loop exchange| 
+
+0.111391 [s]  GFLOPS 15.885216  |unoptimized| 
+0.112517 [s]  GFLOPS 15.726271  |loop exchange| 
+
+0.111630 [s]  GFLOPS 15.851218  |unoptimized| 
+0.111647 [s]  GFLOPS 15.848822  |loop exchange| 
+
+0.111569 [s]  GFLOPS 15.859884  |unoptimized| 
+0.111434 [s]  GFLOPS 15.879116  |loop exchange| 
+
+0.111289 [s]  GFLOPS 15.899784  |unoptimized| 
+0.111252 [s]  GFLOPS 15.905090  |loop exchange| 
+
+0.112305 [s]  GFLOPS 15.755949  |unoptimized| 
+0.111233 [s]  GFLOPS 15.907813  |loop exchange| 
+
+0.111184 [s]  GFLOPS 15.914798  |unoptimized| 
+0.111254 [s]  GFLOPS 15.904780  |loop exchange| 
+
+0.111202 [s]  GFLOPS 15.912225  |unoptimized| 
+0.111212 [s]  GFLOPS 15.910785  |loop exchange| 
+[1;32m✓ ブロックサイズ 32 のテスト完了[0m
+[1;36mℹ ブロックサイズ: 64[0m
+rm -f *.o gemm-test
+icc -qopenmp -O3 -xCORE-AVX512 -g -c gemm-test.c
+icc -o gemm-test gemm-test.o -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread -lm
+[1;36mℹ ブロッキングテスト実行中（ブロックサイズ: 64）...[0m
+taskset -c 0-$((4-1)) ./gemm-test 960 10
+data_size : double(default)
+array size N = 960
+blocking size = 64
+The number of threads= 4
+iterations = 10
+
+0.112404 [s]  GFLOPS 15.742080  |unoptimized| 
+0.110281 [s]  GFLOPS 16.045119  |loop exchange| 
+
+0.110284 [s]  GFLOPS 16.044672  |unoptimized| 
+0.111890 [s]  GFLOPS 15.814402  |loop exchange| 
+
+0.110602 [s]  GFLOPS 15.998561  |unoptimized| 
+0.110279 [s]  GFLOPS 16.045425  |loop exchange| 
+
+0.110619 [s]  GFLOPS 15.996079  |unoptimized| 
+0.115151 [s]  GFLOPS 15.366524  |loop exchange| 
+
+0.110564 [s]  GFLOPS 16.004049  |unoptimized| 
+0.117501 [s]  GFLOPS 15.059213  |loop exchange| 
+
+0.112220 [s]  GFLOPS 15.767873  |unoptimized| 
+0.111461 [s]  GFLOPS 15.875265  |loop exchange| 
+
+0.112496 [s]  GFLOPS 15.729203  |unoptimized| 
+0.110403 [s]  GFLOPS 16.027400  |loop exchange| 
+
+0.112931 [s]  GFLOPS 15.668615  |unoptimized| 
+0.112869 [s]  GFLOPS 15.677227  |loop exchange| 
+
+0.110543 [s]  GFLOPS 16.007089  |unoptimized| 
+0.110320 [s]  GFLOPS 16.039455  |loop exchange| 
+
+0.112481 [s]  GFLOPS 15.731303  |unoptimized| 
+0.110877 [s]  GFLOPS 15.958876  |loop exchange| 
+[1;32m✓ ブロックサイズ 64 のテスト完了[0m
+
+[1;34m=== AVX2ベクトル化テスト ===[0m
+rm -f *.o gemm-test
+icc -qopenmp -O3 -xCORE-AVX512 -g -c gemm-test.c
+icc -o gemm-test gemm-test.o -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread -lm
+[1;36mℹ AVX2テスト実行中...[0m
+taskset -c 0-$((4-1)) ./gemm-test 960 10
+data_size : double(default)
+array size N = 960
+blocking size = 32
+The number of threads= 4
+iterations = 10
+
+0.116565 [s]  GFLOPS 15.180119  |unoptimized| 
+0.111865 [s]  GFLOPS 15.817914  |loop exchange| 
+
+0.112779 [s]  GFLOPS 15.689729  |unoptimized| 
+0.110781 [s]  GFLOPS 15.972691  |loop exchange| 
+
+0.111056 [s]  GFLOPS 15.933142  |unoptimized| 
+0.110967 [s]  GFLOPS 15.945945  |loop exchange| 
+
+0.112112 [s]  GFLOPS 15.783060  |unoptimized| 
+0.110558 [s]  GFLOPS 16.004919  |loop exchange| 
+
+0.111206 [s]  GFLOPS 15.911645  |unoptimized| 
+0.110505 [s]  GFLOPS 16.012603  |loop exchange| 
+
+0.112133 [s]  GFLOPS 15.780125  |unoptimized| 
+0.110593 [s]  GFLOPS 15.999861  |loop exchange| 
+
+0.111271 [s]  GFLOPS 15.902360  |unoptimized| 
+0.112086 [s]  GFLOPS 15.786739  |loop exchange| 
+
+0.117460 [s]  GFLOPS 15.064464  |unoptimized| 
+0.110960 [s]  GFLOPS 15.946953  |loop exchange| 
+
+0.111025 [s]  GFLOPS 15.937591  |unoptimized| 
+0.112407 [s]  GFLOPS 15.741655  |loop exchange| 
+
+0.110785 [s]  GFLOPS 15.972132  |unoptimized| 
+0.110753 [s]  GFLOPS 15.976745  |loop exchange| 
+[1;32m✓ AVX2テスト完了[0m
+
+[1;34m=== OpenMP並列化テスト ===[0m
+rm -f *.o gemm-test
+icc -qopenmp -O3 -xCORE-AVX512 -g -c gemm-test.c
+icc -o gemm-test gemm-test.o -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread -lm
+[1;36mℹ スレッド数: 1[0m
+[1;36mℹ OpenMPテスト実行中（スレッド数: 1）...[0m
+taskset -c 0-$((1-1)) ./gemm-test 960 10
+data_size : double(default)
+array size N = 960
+blocking size = 32
+The number of threads= 1
+iterations = 10
+
+0.111377 [s]  GFLOPS 15.887241  |unoptimized| 
+0.110721 [s]  GFLOPS 15.981352  |loop exchange| 
+
+0.112185 [s]  GFLOPS 15.772815  |unoptimized| 
+0.110633 [s]  GFLOPS 15.994069  |loop exchange| 
+
+0.111435 [s]  GFLOPS 15.878969  |unoptimized| 
+0.110733 [s]  GFLOPS 15.979631  |loop exchange| 
+
+0.110899 [s]  GFLOPS 15.955709  |unoptimized| 
+0.110355 [s]  GFLOPS 16.034369  |loop exchange| 
+
+0.111126 [s]  GFLOPS 15.923099  |unoptimized| 
+0.112474 [s]  GFLOPS 15.732286  |loop exchange| 
+
+0.110165 [s]  GFLOPS 16.062003  |unoptimized| 
+0.110620 [s]  GFLOPS 15.995942  |loop exchange| 
+
+0.110577 [s]  GFLOPS 16.002182  |unoptimized| 
+0.112797 [s]  GFLOPS 15.687235  |loop exchange| 
+
+0.111391 [s]  GFLOPS 15.885237  |unoptimized| 
+0.110210 [s]  GFLOPS 16.055474  |loop exchange| 
+
+0.110704 [s]  GFLOPS 15.983817  |unoptimized| 
+0.111081 [s]  GFLOPS 15.929561  |loop exchange| 
+
+0.110417 [s]  GFLOPS 16.025353  |unoptimized| 
+0.112140 [s]  GFLOPS 15.779122  |loop exchange| 
+[1;32m✓ スレッド数 1 のテスト完了[0m
+[1;36mℹ スレッド数: 2[0m
+[1;36mℹ OpenMPテスト実行中（スレッド数: 2）...[0m
+taskset -c 0-$((2-1)) ./gemm-test 960 10
+data_size : double(default)
+array size N = 960
+blocking size = 32
+The number of threads= 2
+iterations = 10
+
+0.111586 [s]  GFLOPS 15.857488  |unoptimized| 
+0.111214 [s]  GFLOPS 15.910527  |loop exchange| 
+
+0.111646 [s]  GFLOPS 15.848938  |unoptimized| 
+0.111141 [s]  GFLOPS 15.920970  |loop exchange| 
+
+0.111296 [s]  GFLOPS 15.898790  |unoptimized| 
+0.111140 [s]  GFLOPS 15.921118  |loop exchange| 
+
+0.111124 [s]  GFLOPS 15.923418  |unoptimized| 
+0.111167 [s]  GFLOPS 15.917239  |loop exchange| 
+
+0.111268 [s]  GFLOPS 15.902780  |unoptimized| 
+0.111126 [s]  GFLOPS 15.923128  |loop exchange| 
+
+0.111487 [s]  GFLOPS 15.871538  |unoptimized| 
+0.111418 [s]  GFLOPS 15.881380  |loop exchange| 
+
+0.111130 [s]  GFLOPS 15.922533  |unoptimized| 
+0.111130 [s]  GFLOPS 15.922556  |loop exchange| 
+
+0.112150 [s]  GFLOPS 15.777717  |unoptimized| 
+0.111140 [s]  GFLOPS 15.921112  |loop exchange| 
+
+0.110968 [s]  GFLOPS 15.945792  |unoptimized| 
+0.111190 [s]  GFLOPS 15.913961  |loop exchange| 
+
+0.111031 [s]  GFLOPS 15.936749  |unoptimized| 
+0.111099 [s]  GFLOPS 15.926987  |loop exchange| 
+[1;32m✓ スレッド数 2 のテスト完了[0m
+[1;36mℹ スレッド数: 4[0m
+[1;36mℹ OpenMPテスト実行中（スレッド数: 4）...[0m
+taskset -c 0-$((4-1)) ./gemm-test 960 10
+data_size : double(default)
+array size N = 960
+blocking size = 32
+The number of threads= 4
+iterations = 10
+
+0.111196 [s]  GFLOPS 15.913104  |unoptimized| 
+0.111219 [s]  GFLOPS 15.909787  |loop exchange| 
+
+0.111162 [s]  GFLOPS 15.917958  |unoptimized| 
+0.111169 [s]  GFLOPS 15.916953  |loop exchange| 
+
+0.111085 [s]  GFLOPS 15.928986  |unoptimized| 
+0.111098 [s]  GFLOPS 15.927127  |loop exchange| 
+
+0.111260 [s]  GFLOPS 15.903942  |unoptimized| 
+0.111088 [s]  GFLOPS 15.928563  |loop exchange| 
+
+0.111189 [s]  GFLOPS 15.914083  |unoptimized| 
+0.111205 [s]  GFLOPS 15.911816  |loop exchange| 
+
+0.111067 [s]  GFLOPS 15.931569  |unoptimized| 
+0.111085 [s]  GFLOPS 15.928996  |loop exchange| 
+
+0.111203 [s]  GFLOPS 15.912072  |unoptimized| 
+0.111764 [s]  GFLOPS 15.832217  |loop exchange| 
+
+0.112260 [s]  GFLOPS 15.762268  |unoptimized| 
+0.111165 [s]  GFLOPS 15.917520  |loop exchange| 
+
+0.111128 [s]  GFLOPS 15.922819  |unoptimized| 
+0.111256 [s]  GFLOPS 15.904505  |loop exchange| 
+
+0.111161 [s]  GFLOPS 15.918096  |unoptimized| 
+0.111202 [s]  GFLOPS 15.912217  |loop exchange| 
+[1;32m✓ スレッド数 4 のテスト完了[0m
+[1;36mℹ スレッド数: 8[0m
+[1;36mℹ OpenMPテスト実行中（スレッド数: 8）...[0m
+taskset -c 0-$((8-1)) ./gemm-test 960 10
+data_size : double(default)
+array size N = 960
+blocking size = 32
+The number of threads= 8
+iterations = 10
+
+0.111502 [s]  GFLOPS 15.869428  |unoptimized| 
+0.111479 [s]  GFLOPS 15.872706  |loop exchange| 
+
+0.111411 [s]  GFLOPS 15.882380  |unoptimized| 
+0.111311 [s]  GFLOPS 15.896659  |loop exchange| 
+
+0.111314 [s]  GFLOPS 15.896220  |unoptimized| 
+0.111230 [s]  GFLOPS 15.908219  |loop exchange| 
+
+0.112032 [s]  GFLOPS 15.794350  |unoptimized| 
+0.111303 [s]  GFLOPS 15.897777  |loop exchange| 
+
+0.111285 [s]  GFLOPS 15.900373  |unoptimized| 
+0.111206 [s]  GFLOPS 15.911643  |loop exchange| 
+
+0.111175 [s]  GFLOPS 15.916094  |unoptimized| 
+0.111234 [s]  GFLOPS 15.907669  |loop exchange| 
+
+0.111161 [s]  GFLOPS 15.918101  |unoptimized| 
+0.111174 [s]  GFLOPS 15.916225  |loop exchange| 
+
+0.112715 [s]  GFLOPS 15.698636  |unoptimized| 
+0.111195 [s]  GFLOPS 15.913224  |loop exchange| 
+
+0.111670 [s]  GFLOPS 15.845540  |unoptimized| 
+0.111128 [s]  GFLOPS 15.922818  |loop exchange| 
+
+0.111182 [s]  GFLOPS 15.915086  |unoptimized| 
+0.111635 [s]  GFLOPS 15.850526  |loop exchange| 
+[1;32m✓ スレッド数 8 のテスト完了[0m
+
+[1;34m=== AVX2 + OpenMP組み合わせテスト ===[0m
+rm -f *.o gemm-test
+icc -qopenmp -O3 -xCORE-AVX512 -g -c gemm-test.c
+icc -o gemm-test gemm-test.o -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread -lm
+[1;36mℹ AVX2 + OpenMP スレッド数: 1[0m
+[1;36mℹ AVX2 + OpenMPテスト実行中（スレッド数: 1）...[0m
+taskset -c 0-$((1-1)) ./gemm-test 960 10
+data_size : double(default)
+array size N = 960
+blocking size = 32
+The number of threads= 1
+iterations = 10
+
+0.111163 [s]  GFLOPS 15.917808  |unoptimized| 
+0.110409 [s]  GFLOPS 16.026534  |loop exchange| 
+
+0.110272 [s]  GFLOPS 16.046438  |unoptimized| 
+0.116555 [s]  GFLOPS 15.181420  |loop exchange| 
+
+0.110776 [s]  GFLOPS 15.973428  |unoptimized| 
+0.114245 [s]  GFLOPS 15.488407  |loop exchange| 
+
+0.110637 [s]  GFLOPS 15.993485  |unoptimized| 
+0.112032 [s]  GFLOPS 15.794349  |loop exchange| 
+
+0.114575 [s]  GFLOPS 15.443790  |unoptimized| 
+0.112252 [s]  GFLOPS 15.763395  |loop exchange| 
+
+0.111691 [s]  GFLOPS 15.842550  |unoptimized| 
+0.110443 [s]  GFLOPS 16.021587  |loop exchange| 
+
+0.110343 [s]  GFLOPS 16.036092  |unoptimized| 
+0.110330 [s]  GFLOPS 16.037986  |loop exchange| 
+
+0.112496 [s]  GFLOPS 15.729195  |unoptimized| 
+0.111353 [s]  GFLOPS 15.890639  |loop exchange| 
+
+0.110287 [s]  GFLOPS 16.044235  |unoptimized| 
+0.110388 [s]  GFLOPS 16.029556  |loop exchange| 
+
+0.110584 [s]  GFLOPS 16.001172  |unoptimized| 
+0.110123 [s]  GFLOPS 16.068158  |loop exchange| 
+[1;32m✓ AVX2 + OpenMP スレッド数 1 のテスト完了[0m
+[1;36mℹ AVX2 + OpenMP スレッド数: 2[0m
+[1;36mℹ AVX2 + OpenMPテスト実行中（スレッド数: 2）...[0m
+taskset -c 0-$((2-1)) ./gemm-test 960 10
+data_size : double(default)
+array size N = 960
+blocking size = 32
+The number of threads= 2
+iterations = 10
+
+0.111456 [s]  GFLOPS 15.875968  |unoptimized| 
+0.111358 [s]  GFLOPS 15.889950  |loop exchange| 
+
+0.111800 [s]  GFLOPS 15.827114  |unoptimized| 
+0.111225 [s]  GFLOPS 15.908936  |loop exchange| 
+
+0.111153 [s]  GFLOPS 15.919261  |unoptimized| 
+0.111255 [s]  GFLOPS 15.904638  |loop exchange| 
+
+0.111197 [s]  GFLOPS 15.912961  |unoptimized| 
+0.111158 [s]  GFLOPS 15.918529  |loop exchange| 
+
+0.111285 [s]  GFLOPS 15.900361  |unoptimized| 
+0.111253 [s]  GFLOPS 15.904944  |loop exchange| 
+
+0.111184 [s]  GFLOPS 15.914816  |unoptimized| 
+0.111388 [s]  GFLOPS 15.885659  |loop exchange| 
+
+0.111342 [s]  GFLOPS 15.892218  |unoptimized| 
+0.111662 [s]  GFLOPS 15.846685  |loop exchange| 
+
+0.112717 [s]  GFLOPS 15.698364  |unoptimized| 
+0.111294 [s]  GFLOPS 15.899072  |loop exchange| 
+
+0.111878 [s]  GFLOPS 15.816086  |unoptimized| 
+0.111665 [s]  GFLOPS 15.846249  |loop exchange| 
+
+0.111189 [s]  GFLOPS 15.914090  |unoptimized| 
+0.111227 [s]  GFLOPS 15.908655  |loop exchange| 
+[1;32m✓ AVX2 + OpenMP スレッド数 2 のテスト完了[0m
+[1;36mℹ AVX2 + OpenMP スレッド数: 4[0m
+[1;36mℹ AVX2 + OpenMPテスト実行中（スレッド数: 4）...[0m
+taskset -c 0-$((4-1)) ./gemm-test 960 10
+data_size : double(default)
+array size N = 960
+blocking size = 32
+The number of threads= 4
+iterations = 10
+
+0.111401 [s]  GFLOPS 15.883822  |unoptimized| 
+0.111421 [s]  GFLOPS 15.880945  |loop exchange| 
+
+0.111430 [s]  GFLOPS 15.879683  |unoptimized| 
+0.111554 [s]  GFLOPS 15.862015  |loop exchange| 
+
+0.111431 [s]  GFLOPS 15.879539  |unoptimized| 
+0.111434 [s]  GFLOPS 15.879108  |loop exchange| 
+
+0.111369 [s]  GFLOPS 15.888378  |unoptimized| 
+0.112921 [s]  GFLOPS 15.669991  |loop exchange| 
+
+0.111331 [s]  GFLOPS 15.893782  |unoptimized| 
+0.111577 [s]  GFLOPS 15.858760  |loop exchange| 
+
+0.111454 [s]  GFLOPS 15.876247  |unoptimized| 
+0.111404 [s]  GFLOPS 15.883373  |loop exchange| 
+
+0.111317 [s]  GFLOPS 15.895792  |unoptimized| 
+0.111423 [s]  GFLOPS 15.880656  |loop exchange| 
+
+0.112610 [s]  GFLOPS 15.713292  |unoptimized| 
+0.112268 [s]  GFLOPS 15.761127  |loop exchange| 
+
+0.111726 [s]  GFLOPS 15.837592  |unoptimized| 
+0.111625 [s]  GFLOPS 15.851928  |loop exchange| 
+
+0.111516 [s]  GFLOPS 15.867439  |unoptimized| 
+0.111505 [s]  GFLOPS 15.869001  |loop exchange| 
+[1;32m✓ AVX2 + OpenMP スレッド数 4 のテスト完了[0m
+[1;36mℹ AVX2 + OpenMP スレッド数: 8[0m
+[1;36mℹ AVX2 + OpenMPテスト実行中（スレッド数: 8）...[0m
+taskset -c 0-$((8-1)) ./gemm-test 960 10
+data_size : double(default)
+array size N = 960
+blocking size = 32
+The number of threads= 8
+iterations = 10
+
+0.110635 [s]  GFLOPS 15.993772  |unoptimized| 
+0.111036 [s]  GFLOPS 15.936028  |loop exchange| 
+
+0.110175 [s]  GFLOPS 16.060565  |unoptimized| 
+0.109961 [s]  GFLOPS 16.091808  |loop exchange| 
+
+0.110145 [s]  GFLOPS 16.064948  |unoptimized| 
+0.111204 [s]  GFLOPS 15.911940  |loop exchange| 
+
+0.110300 [s]  GFLOPS 16.042366  |unoptimized| 
+0.110457 [s]  GFLOPS 16.019553  |loop exchange| 
+
+0.110828 [s]  GFLOPS 15.965921  |unoptimized| 
+0.110832 [s]  GFLOPS 15.965363  |loop exchange| 
+
+0.109915 [s]  GFLOPS 16.098557  |unoptimized| 
+0.110307 [s]  GFLOPS 16.041353  |loop exchange| 
+
+0.110821 [s]  GFLOPS 15.966929  |unoptimized| 
+0.110194 [s]  GFLOPS 16.057799  |loop exchange| 
+
+0.112115 [s]  GFLOPS 15.782660  |unoptimized| 
+0.112727 [s]  GFLOPS 15.696975  |loop exchange| 
+
+0.111387 [s]  GFLOPS 15.885811  |unoptimized| 
+0.111139 [s]  GFLOPS 15.921265  |loop exchange| 
+
+0.109930 [s]  GFLOPS 16.096335  |unoptimized| 
+0.109775 [s]  GFLOPS 16.119076  |loop exchange| 
+[1;32m✓ AVX2 + OpenMP スレッド数 8 のテスト完了[0m
+
+[1;34m=== ループアンローリングテスト ===[0m
+[1;36mℹ 修正版ループアンローリングテスト[0m
+rm -f *.o gemm-test
+icc -qopenmp -O3 -xCORE-AVX512 -g -c gemm-test.c
+icc -o gemm-test gemm-test.o -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread -lm
+=== 修正版ループアンローリングテスト ===
+taskset -c 0-$((8-1)) ./gemm-test 960 10
+data_size : double(default)
+array size N = 960
+blocking size = 32
+The number of threads= 8
+iterations = 10
+
+0.112962 [s]  GFLOPS 15.664301  |unoptimized| 
+0.111822 [s]  GFLOPS 15.824002  |loop exchange| 
+
+0.111210 [s]  GFLOPS 15.911072  |unoptimized| 
+0.111625 [s]  GFLOPS 15.851933  |loop exchange| 
+
+0.111161 [s]  GFLOPS 15.918111  |unoptimized| 
+0.112078 [s]  GFLOPS 15.787856  |loop exchange| 
+
+0.111338 [s]  GFLOPS 15.892789  |unoptimized| 
+0.111624 [s]  GFLOPS 15.852074  |loop exchange| 
+
+0.111141 [s]  GFLOPS 15.920957  |unoptimized| 
+0.111540 [s]  GFLOPS 15.864015  |loop exchange| 
+
+0.111116 [s]  GFLOPS 15.924535  |unoptimized| 
+0.111589 [s]  GFLOPS 15.857030  |loop exchange| 
+
+0.111536 [s]  GFLOPS 15.864575  |unoptimized| 
+0.111542 [s]  GFLOPS 15.863745  |loop exchange| 
+
+0.114386 [s]  GFLOPS 15.469293  |unoptimized| 
+0.120982 [s]  GFLOPS 14.625898  |loop exchange| 
+
+0.119436 [s]  GFLOPS 14.815238  |unoptimized| 
+0.117421 [s]  GFLOPS 15.069464  |loop exchange| 
+
+0.116912 [s]  GFLOPS 15.135065  |unoptimized| 
+0.116993 [s]  GFLOPS 15.124590  |loop exchange| 
+[1;36mℹ 最適化版ループアンローリングテスト[0m
+rm -f *.o gemm-test
+icc -qopenmp -O3 -xCORE-AVX512 -g -c gemm-test.c
+icc -o gemm-test gemm-test.o -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread -lm
+=== 最適化版ループアンローリングテスト ===
+taskset -c 0-$((8-1)) ./gemm-test 960 10
+data_size : double(default)
+array size N = 960
+blocking size = 32
+The number of threads= 8
+iterations = 10
+
+0.112517 [s]  GFLOPS 15.726273  |unoptimized| 
+0.110368 [s]  GFLOPS 16.032459  |loop exchange| 
+
+0.110888 [s]  GFLOPS 15.957282  |unoptimized| 
+0.111568 [s]  GFLOPS 15.860046  |loop exchange| 
+
+0.111025 [s]  GFLOPS 15.937585  |unoptimized| 
+0.111429 [s]  GFLOPS 15.879809  |loop exchange| 
+
+0.110530 [s]  GFLOPS 16.008988  |unoptimized| 
+0.111988 [s]  GFLOPS 15.800535  |loop exchange| 
+
+0.111353 [s]  GFLOPS 15.890656  |unoptimized| 
+0.110604 [s]  GFLOPS 15.998278  |loop exchange| 
+
+0.111438 [s]  GFLOPS 15.878539  |unoptimized| 
+0.110565 [s]  GFLOPS 16.003894  |loop exchange| 
+
+0.113151 [s]  GFLOPS 15.638148  |unoptimized| 
+0.111043 [s]  GFLOPS 15.935010  |loop exchange| 
+
+0.116617 [s]  GFLOPS 15.173347  |unoptimized| 
+0.116194 [s]  GFLOPS 15.228604  |loop exchange| 
+
+0.113013 [s]  GFLOPS 15.657256  |unoptimized| 
+0.110970 [s]  GFLOPS 15.945490  |loop exchange| 
+
+0.111276 [s]  GFLOPS 15.901651  |unoptimized| 
+0.110588 [s]  GFLOPS 16.000569  |loop exchange| 
+[1;36mℹ ブロッキング + ループアンローリングテスト[0m
+rm -f *.o gemm-test
+icc -qopenmp -O3 -xCORE-AVX512 -g -c gemm-test.c
+icc -o gemm-test gemm-test.o -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread -lm
+=== ブロッキング + ループアンローリングテスト ===
+taskset -c 0-$((8-1)) ./gemm-test 960 10
+data_size : double(default)
+array size N = 960
+blocking size = 32
+The number of threads= 8
+iterations = 10
+
+0.111760 [s]  GFLOPS 15.832770  |unoptimized| 
+0.111727 [s]  GFLOPS 15.837468  |loop exchange| 
+
+0.111377 [s]  GFLOPS 15.887236  |unoptimized| 
+0.111604 [s]  GFLOPS 15.854923  |loop exchange| 
+
+0.111243 [s]  GFLOPS 15.906378  |unoptimized| 
+0.111242 [s]  GFLOPS 15.906519  |loop exchange| 
+
+0.111120 [s]  GFLOPS 15.923982  |unoptimized| 
+0.111071 [s]  GFLOPS 15.930986  |loop exchange| 
+
+0.111145 [s]  GFLOPS 15.920398  |unoptimized| 
+0.111224 [s]  GFLOPS 15.909092  |loop exchange| 
+
+0.111140 [s]  GFLOPS 15.921094  |unoptimized| 
+0.112041 [s]  GFLOPS 15.793083  |loop exchange| 
+
+0.111276 [s]  GFLOPS 15.901644  |unoptimized| 
+0.111291 [s]  GFLOPS 15.899523  |loop exchange| 
+
+0.112475 [s]  GFLOPS 15.732146  |unoptimized| 
+0.111391 [s]  GFLOPS 15.885228  |loop exchange| 
+
+0.111588 [s]  GFLOPS 15.857193  |unoptimized| 
+0.111971 [s]  GFLOPS 15.802950  |loop exchange| 
+
+0.111737 [s]  GFLOPS 15.836055  |unoptimized| 
+0.111235 [s]  GFLOPS 15.907522  |loop exchange| 
+[1;36mℹ OpenMP + ループアンローリングテスト[0m
+rm -f *.o gemm-test
+icc -qopenmp -O3 -xCORE-AVX512 -g -c gemm-test.c
+icc -o gemm-test gemm-test.o -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread -lm
+[1;36mℹ OpenMP + ループアンローリング スレッド数: 1[0m
+=== OpenMP + ループアンローリング スレッド数: 1 ===
+taskset -c 0-$((1-1)) ./gemm-test 960 10
+data_size : double(default)
+array size N = 960
+blocking size = 32
+The number of threads= 1
+iterations = 10
+
+0.111031 [s]  GFLOPS 15.936749  |unoptimized| 
+0.111812 [s]  GFLOPS 15.825435  |loop exchange| 
+
+0.110338 [s]  GFLOPS 16.036836  |unoptimized| 
+0.110837 [s]  GFLOPS 15.964630  |loop exchange| 
+
+0.113174 [s]  GFLOPS 15.634973  |unoptimized| 
+0.116198 [s]  GFLOPS 15.228090  |loop exchange| 
+
+0.111221 [s]  GFLOPS 15.909503  |unoptimized| 
+0.110839 [s]  GFLOPS 15.964334  |loop exchange| 
+
+0.110757 [s]  GFLOPS 15.976161  |unoptimized| 
+0.111071 [s]  GFLOPS 15.930986  |loop exchange| 
+
+0.110511 [s]  GFLOPS 16.011725  |unoptimized| 
+0.118366 [s]  GFLOPS 14.949154  |loop exchange| 
+
+0.113645 [s]  GFLOPS 15.570184  |unoptimized| 
+0.110725 [s]  GFLOPS 15.980781  |loop exchange| 
+
+0.112338 [s]  GFLOPS 15.751309  |unoptimized| 
+0.112825 [s]  GFLOPS 15.683324  |loop exchange| 
+
+0.112592 [s]  GFLOPS 15.715799  |unoptimized| 
+0.111031 [s]  GFLOPS 15.936747  |loop exchange| 
+
+0.115200 [s]  GFLOPS 15.360010  |unoptimized| 
+0.116052 [s]  GFLOPS 15.247242  |loop exchange| 
+[1;36mℹ OpenMP + ループアンローリング スレッド数: 2[0m
+=== OpenMP + ループアンローリング スレッド数: 2 ===
+taskset -c 0-$((2-1)) ./gemm-test 960 10
+data_size : double(default)
+array size N = 960
+blocking size = 32
+The number of threads= 2
+iterations = 10
+
+0.111999 [s]  GFLOPS 15.798984  |unoptimized| 
+0.111266 [s]  GFLOPS 15.903090  |loop exchange| 
+
+0.111299 [s]  GFLOPS 15.898380  |unoptimized| 
+0.111436 [s]  GFLOPS 15.878834  |loop exchange| 
+
+0.111711 [s]  GFLOPS 15.839726  |unoptimized| 
+0.111347 [s]  GFLOPS 15.891508  |loop exchange| 
+
+0.111148 [s]  GFLOPS 15.919961  |unoptimized| 
+0.111522 [s]  GFLOPS 15.866581  |loop exchange| 
+
+0.111214 [s]  GFLOPS 15.910523  |unoptimized| 
+0.111301 [s]  GFLOPS 15.898079  |loop exchange| 
+
+0.111343 [s]  GFLOPS 15.892078  |unoptimized| 
+0.111337 [s]  GFLOPS 15.892951  |loop exchange| 
+
+0.111256 [s]  GFLOPS 15.904514  |unoptimized| 
+0.111297 [s]  GFLOPS 15.898665  |loop exchange| 
+
+0.112492 [s]  GFLOPS 15.729762  |unoptimized| 
+0.111254 [s]  GFLOPS 15.904785  |loop exchange| 
+
+0.111295 [s]  GFLOPS 15.898948  |unoptimized| 
+0.111266 [s]  GFLOPS 15.903069  |loop exchange| 
+
+0.111392 [s]  GFLOPS 15.885094  |unoptimized| 
+0.111237 [s]  GFLOPS 15.907212  |loop exchange| 
+[1;36mℹ OpenMP + ループアンローリング スレッド数: 4[0m
+=== OpenMP + ループアンローリング スレッド数: 4 ===
+taskset -c 0-$((4-1)) ./gemm-test 960 10
+data_size : double(default)
+array size N = 960
+blocking size = 32
+The number of threads= 4
+iterations = 10
+
+0.113346 [s]  GFLOPS 15.611259  |unoptimized| 
+0.114248 [s]  GFLOPS 15.487982  |loop exchange| 
+
+0.110422 [s]  GFLOPS 16.024646  |unoptimized| 
+0.110416 [s]  GFLOPS 16.025495  |loop exchange| 
+
+0.110464 [s]  GFLOPS 16.018523  |unoptimized| 
+0.111460 [s]  GFLOPS 15.875414  |loop exchange| 
+
+0.111098 [s]  GFLOPS 15.927114  |unoptimized| 
+0.113736 [s]  GFLOPS 15.557700  |loop exchange| 
+
+0.110452 [s]  GFLOPS 16.020267  |unoptimized| 
+0.110879 [s]  GFLOPS 15.958595  |loop exchange| 
+
+0.118321 [s]  GFLOPS 14.954853  |unoptimized| 
+0.117687 [s]  GFLOPS 15.035394  |loop exchange| 
+
+0.113204 [s]  GFLOPS 15.630813  |unoptimized| 
+0.111515 [s]  GFLOPS 15.867571  |loop exchange| 
+
+0.112728 [s]  GFLOPS 15.696844  |unoptimized| 
+0.111327 [s]  GFLOPS 15.894379  |loop exchange| 
+
+0.113015 [s]  GFLOPS 15.656964  |unoptimized| 
+0.110653 [s]  GFLOPS 15.991169  |loop exchange| 
+
+0.110824 [s]  GFLOPS 15.966508  |unoptimized| 
+0.111572 [s]  GFLOPS 15.859463  |loop exchange| 
+[1;36mℹ OpenMP + ループアンローリング スレッド数: 8[0m
+=== OpenMP + ループアンローリング スレッド数: 8 ===
+taskset -c 0-$((8-1)) ./gemm-test 960 10
+data_size : double(default)
+array size N = 960
+blocking size = 32
+The number of threads= 8
+iterations = 10
+
+0.110403 [s]  GFLOPS 16.027392  |unoptimized| 
+0.110476 [s]  GFLOPS 16.016798  |loop exchange| 
+
+0.111023 [s]  GFLOPS 15.937886  |unoptimized| 
+0.111249 [s]  GFLOPS 15.905518  |loop exchange| 
+
+0.110774 [s]  GFLOPS 15.973727  |unoptimized| 
+0.111769 [s]  GFLOPS 15.831524  |loop exchange| 
+
+0.111657 [s]  GFLOPS 15.847388  |unoptimized| 
+0.111319 [s]  GFLOPS 15.895502  |loop exchange| 
+
+0.109899 [s]  GFLOPS 16.100896  |unoptimized| 
+0.109936 [s]  GFLOPS 16.095491  |loop exchange| 
+
+0.114207 [s]  GFLOPS 15.493550  |unoptimized| 
+0.110335 [s]  GFLOPS 16.037259  |loop exchange| 
+
+0.109935 [s]  GFLOPS 16.095629  |unoptimized| 
+0.111791 [s]  GFLOPS 15.828389  |loop exchange| 
+
+0.114389 [s]  GFLOPS 15.468906  |unoptimized| 
+0.111355 [s]  GFLOPS 15.890356  |loop exchange| 
+
+0.110350 [s]  GFLOPS 16.035103  |unoptimized| 
+0.111235 [s]  GFLOPS 15.907509  |loop exchange| 
+
+0.111849 [s]  GFLOPS 15.820174  |unoptimized| 
+0.110476 [s]  GFLOPS 16.016810  |loop exchange| 
+[1;32m✓ ループアンローリングテスト完了[0m
+
+[1;34m=== MKLライブラリテスト ===[0m
+rm -f *.o gemm-test
+icc -qopenmp -O3 -xCORE-AVX512 -g -c gemm-test.c
+icc -o gemm-test gemm-test.o -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread -lm
+[1;36mℹ MKLテスト実行中...[0m
+taskset -c 0-$((8-1)) ./gemm-test 960 10
+data_size : double(default)
+array size N = 960
+blocking size = 32
+The number of threads= 8
+iterations = 10
+
+0.111417 [s]  GFLOPS 15.881534  |unoptimized| 
+0.110686 [s]  GFLOPS 15.986421  |loop exchange| 
+
+0.110464 [s]  GFLOPS 16.018536  |unoptimized| 
+0.110140 [s]  GFLOPS 16.065660  |loop exchange| 
+
+0.110274 [s]  GFLOPS 16.046146  |unoptimized| 
+0.110590 [s]  GFLOPS 16.000298  |loop exchange| 
+
+0.110953 [s]  GFLOPS 15.947946  |unoptimized| 
+0.110604 [s]  GFLOPS 15.998260  |loop exchange| 
+
+0.113122 [s]  GFLOPS 15.642162  |unoptimized| 
+0.111457 [s]  GFLOPS 15.875827  |loop exchange| 
+
+0.111976 [s]  GFLOPS 15.802255  |unoptimized| 
+0.110882 [s]  GFLOPS 15.958144  |loop exchange| 
+
+0.111179 [s]  GFLOPS 15.915530  |unoptimized| 
+0.111242 [s]  GFLOPS 15.906514  |loop exchange| 
+
+0.111183 [s]  GFLOPS 15.914948  |unoptimized| 
+0.110427 [s]  GFLOPS 16.023922  |loop exchange| 
+
+0.110848 [s]  GFLOPS 15.963050  |unoptimized| 
+0.110554 [s]  GFLOPS 16.005506  |loop exchange| 
+
+0.110475 [s]  GFLOPS 16.016935  |unoptimized| 
+0.110476 [s]  GFLOPS 16.016816  |loop exchange| 
+[1;32m✓ MKLテスト完了[0m
