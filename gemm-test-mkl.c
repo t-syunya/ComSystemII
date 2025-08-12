@@ -75,6 +75,7 @@ void dgemm_blocking(REAL *A, REAL *B, REAL *C, int n)
 }
 
 /* AVX2 */
+#ifdef AVX2
 void dgemm_AVX2(REAL *A, REAL *B, REAL *C, int n)
 {
     int i, j, k;
@@ -113,6 +114,7 @@ void dgemm_AVX2(REAL *A, REAL *B, REAL *C, int n)
     }
 #endif
 }
+#endif
 
 /* OpenMP */
 void dgemm_OMP(REAL *A, REAL *B, REAL *C, int n)
@@ -128,6 +130,7 @@ void dgemm_OMP(REAL *A, REAL *B, REAL *C, int n)
 }
 
 /* AVX + OpenMP */
+#ifdef AVX2
 void dgemm_AVX_OMP(REAL *A, REAL *B, REAL *C, int n)
 {
     int i, j, k;
@@ -166,6 +169,7 @@ void dgemm_AVX_OMP(REAL *A, REAL *B, REAL *C, int n)
     }
 #endif
 }
+#endif
 
 /* Loop Unrolling - 正しい実装（列優先アクセス） */
 void dgemm_unroll(REAL *A, REAL *B, REAL *C, int n)

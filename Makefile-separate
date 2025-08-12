@@ -18,7 +18,7 @@ gemm-test-blocking: gemm-test-blocking.c
 
 # AVX2版
 gemm-test-avx2: gemm-test-avx2.c
-	$(CC) $(CFLAGS) -o $@ $< $(LDFLAGS)
+	$(CC) $(CFLAGS) -mavx2 -o $@ $< $(LDFLAGS)
 
 # OpenMP版
 gemm-test-openmp: gemm-test-openmp.c

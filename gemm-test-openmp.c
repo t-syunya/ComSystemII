@@ -8,15 +8,15 @@
 #define BLOCKSIZE 32
 
 // OpenMP最適化のみ有効化
-//#define BLOCKING
-//#define AVX2
+// #define BLOCKING
+// #define AVX2
 #define OMP
-//#define AVX_OMP
-//#define MKL
-//#define UNROLL_ONLY
-//#define UNROLL_OPTIMIZED
-//#define BLOCKING_UNROLL
-//#define OMP_UNROLL
+// #define AVX_OMP
+// #define MKL
+// #define UNROLL_ONLY
+// #define UNROLL_OPTIMIZED
+// #define BLOCKING_UNROLL
+// #define OMP_UNROLL
 
 #ifdef MKL
 #include <mkl.h>
@@ -75,6 +75,7 @@ void dgemm_blocking(REAL *A, REAL *B, REAL *C, int n)
 }
 
 /* AVX2 */
+#ifdef AVX2
 void dgemm_AVX2(REAL *A, REAL *B, REAL *C, int n)
 {
   int i, j, k;
@@ -113,6 +114,7 @@ void dgemm_AVX2(REAL *A, REAL *B, REAL *C, int n)
   }
 #endif
 }
+#endif
 
 /* OpenMP */
 void dgemm_OMP(REAL *A, REAL *B, REAL *C, int n)
@@ -128,6 +130,7 @@ void dgemm_OMP(REAL *A, REAL *B, REAL *C, int n)
 }
 
 /* AVX + OpenMP */
+#ifdef AVX2
 void dgemm_AVX_OMP(REAL *A, REAL *B, REAL *C, int n)
 {
   int i, j, k;
@@ -166,6 +169,7 @@ void dgemm_AVX_OMP(REAL *A, REAL *B, REAL *C, int n)
   }
 #endif
 }
+#endif
 
 /* Loop Unrolling - 正しい実装（列優先アクセス） */
 void dgemm_unroll(REAL *A, REAL *B, REAL *C, int n)
@@ -241,11 +245,12 @@ void do_block_unroll(int n, int si, int sj, int sk, REAL *A, REAL *B, REAL *C)
       for (k = sk; k < sk + BLOCKSIZE - unroll_factor + 1; k += unroll_factor)
       {
         C[i + j * n] += A[i + k * n] * B[k + j * n];
-        C[i + j * n] += A[i + (k+1) * n] * B[(k+1) + j * n];
-        C[i + j * n] += A[i + (k+2) * n] * B[(k+2) + j * n];
-        C[i + j * n] += A[i + (k+3) * n] * B[(k+3) + j * n];
+        C[i + j * n] += A[i + (k + 1) * n] * B[(k + 1) + j * n];
+        C[i + j * n] += A[i + (k + 2) * n] * B[(k + 2) + j * n];
+        C[i + j * n] += A[i + (k + 3) * n] * B[(k + 3) + j * n];
       }
-      for (; k < sk + BLOCKSIZE; k++) C[i + j * n] += A[i + k * n] * B[k + j * n];
+      for (; k < sk + BLOCKSIZE; k++)
+        C[i + j * n] += A[i + k * n] * B[k + j * n];
     }
   }
 }
@@ -264,8 +269,9 @@ void dgemm_OMP_unroll(REAL *A, REAL *B, REAL *C, int n)
 {
   int i, j, k;
   int unroll_factor = 4;
-  for (i = 0; i < n * n; i++) C[i] = 0.0;
-#pragma omp parallel for private(j,k)
+  for (i = 0; i < n * n; i++)
+    C[i] = 0.0;
+#pragma omp parallel for private(j, k)
   for (i = 0; i < n; i++)
   {
     for (j = 0; j < n; j++)
@@ -273,11 +279,12 @@ void dgemm_OMP_unroll(REAL *A, REAL *B, REAL *C, int n)
       for (k = 0; k <= n - unroll_factor; k += unroll_factor)
       {
         C[i + j * n] += A[i + k * n] * B[k + j * n];
-        C[i + j * n] += A[i + (k+1) * n] * B[(k+1) + j * n];
-        C[i + j * n] += A[i + (k+2) * n] * B[(k+2) + j * n];
-        C[i + j * n] += A[i + (k+3) * n] * B[(k+3) + j * n];
+        C[i + j * n] += A[i + (k + 1) * n] * B[(k + 1) + j * n];
+        C[i + j * n] += A[i + (k + 2) * n] * B[(k + 2) + j * n];
+        C[i + j * n] += A[i + (k + 3) * n] * B[(k + 3) + j * n];
       }
-      for (; k < n; k++) C[i + j * n] += A[i + k * n] * B[k + j * n];
+      for (; k < n; k++)
+        C[i + j * n] += A[i + k * n] * B[k + j * n];
     }
   }
 }
