@@ -121,16 +121,16 @@ void dgemm_AVX2(REAL *A, REAL *B, REAL *C, int n) /*AVX2 */
   {
     for (j = 0; j < n; j++)
     {
-      __m256 c0 = _mm256_load_ps(C + i + j * n); /* cij = C[i+j*n]] */
+      __m256 c0 = _mm256_loadu_ps(C + i + j * n); /* cij = C[i+j*n]] */
 
       for (k = 0; k < n; k++)
         c0 =
             _mm256_add_ps(c0,
-                          _mm256_mul_ps(_mm256_load_ps(A + i + k * n),
+                          _mm256_mul_ps(_mm256_loadu_ps(A + i + k * n),
                                         _mm256_broadcast_ss(B + k +
                                                             j * n)));
       /* cij += A[i+k*n] * B[k+j*n] */
-      _mm256_store_ps(C + i + j * n, c0); /* C[i+j*n] = cij */
+      _mm256_storeu_ps(C + i + j * n, c0); /* C[i+j*n] = cij */
     }
   }
 #else
@@ -138,16 +138,16 @@ void dgemm_AVX2(REAL *A, REAL *B, REAL *C, int n) /*AVX2 */
   {
     for (j = 0; j < n; j++)
     {
-      __m256d c0 = _mm256_load_pd(C + i + j * n); /* cij = C[i+j*n]] */
+      __m256d c0 = _mm256_loadu_pd(C + i + j * n); /* cij = C[i+j*n]] */
 
       for (k = 0; k < n; k++)
         c0 =
             _mm256_add_pd(c0,
-                          _mm256_mul_pd(_mm256_load_pd(A + i + k * n),
+                          _mm256_mul_pd(_mm256_loadu_pd(A + i + k * n),
                                         _mm256_broadcast_sd(B + k +
                                                             j * n)));
       /* cij += A[i+k*n] * B[k+j*n] */
-      _mm256_store_pd(C + i + j * n, c0); /* C[i+j*n] = cij */
+      _mm256_storeu_pd(C + i + j * n, c0); /* C[i+j*n] = cij */
     }
   }
 #endif
@@ -163,16 +163,16 @@ void dgemm_AVX_OMP(REAL *A, REAL *B, REAL *C, int n)
   {
     for (j = 0; j < n; j++)
     {
-      __m256 c0 = _mm256_load_ps(C + i + j * n); /* cij = C[i+j*n]] */
+      __m256 c0 = _mm256_loadu_ps(C + i + j * n); /* cij = C[i+j*n]] */
 
       for (k = 0; k < n; k++)
         c0 =
             _mm256_add_ps(c0,
-                          _mm256_mul_ps(_mm256_load_ps(A + i + k * n),
+                          _mm256_mul_ps(_mm256_loadu_ps(A + i + k * n),
                                         _mm256_broadcast_ss(B + k +
                                                             j * n)));
       /* cij += A[i+k*n] * B[k+j*n] */
-      _mm256_store_ps(C + i + j * n, c0); /* C[i+j*n] = cij */
+      _mm256_storeu_ps(C + i + j * n, c0); /* C[i+j*n] = cij */
     }
   }
 #else
@@ -180,16 +180,16 @@ void dgemm_AVX_OMP(REAL *A, REAL *B, REAL *C, int n)
   {
     for (j = 0; j < n; j++)
     {
-      __m256d c0 = _mm256_load_pd(C + i + j * n); /* cij = C[i+j*n]] */
+      __m256d c0 = _mm256_loadu_pd(C + i + j * n); /* cij = C[i+j*n]] */
 
       for (k = 0; k < n; k++)
         c0 =
             _mm256_add_pd(c0,
-                          _mm256_mul_pd(_mm256_load_pd(A + i + k * n),
+                          _mm256_mul_pd(_mm256_loadu_pd(A + i + k * n),
                                         _mm256_broadcast_sd(B + k +
                                                             j * n)));
       /* cij += A[i+k*n] * B[k+j*n] */
-      _mm256_store_pd(C + i + j * n, c0); /* C[i+j*n] = cij */
+      _mm256_storeu_pd(C + i + j * n, c0); /* C[i+j*n] = cij */
     }
   }
 #endif
@@ -200,7 +200,7 @@ void dgemm_AVX_OMP(REAL *A, REAL *B, REAL *C, int n)
 void dgemm_unroll(REAL *A, REAL *B, REAL *C, int n)
 {
   int i, j, k;
-  int unroll_factor = 4; // 固定値ではなく変数として定義
+  int unroll_factor = 4; // 修正版は4要素アンロール
 
   // 初期化
   for (i = 0; i < n * n; i++)
@@ -229,6 +229,7 @@ void dgemm_unroll(REAL *A, REAL *B, REAL *C, int n)
 void dgemm_unroll_optimized(REAL *A, REAL *B, REAL *C, int n)
 {
   int i, j, k;
+  int unroll_factor = 8; // 最適化版は8要素アンロール
 
   // 初期化
   for (i = 0; i < n * n; i++)
@@ -240,7 +241,7 @@ void dgemm_unroll_optimized(REAL *A, REAL *B, REAL *C, int n)
     {
       REAL bkj = B[k + j * n]; // B[k][j]を一度読み込み
       // より大きなアンロール係数（8）
-      for (i = 0; i <= n - 8; i += 8)
+      for (i = 0; i <= n - unroll_factor; i += unroll_factor)
       {
         C[i + j * n] += A[i + k * n] * bkj;
         C[(i + 1) + j * n] += A[(i + 1) + k * n] * bkj;
@@ -386,18 +387,6 @@ int main(int argc, char *argv[])
   }
 
   N = atoi(argv[1]); /* Argument 1:Array size */
-  if (N % 8 != 0)
-  {
-    printf("Please specify N that is a multipe of 8 for AVX 256 bit\n");
-    return 0;
-  }
-
-  if (N % BLOCKSIZE != 0)
-  {
-    printf("Please specify N that is a multipe of BLOCKSIZE(%d) for Blocking\n",
-           BLOCKSIZE);
-    return 0;
-  }
 
   itr = atoi(argv[2]); /* Argument 2:Number of iterations */
 
@@ -487,7 +476,7 @@ int main(int argc, char *argv[])
     t = seconds();
 
 #if defined(FP_SINGLE)
-    cblas_sgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, N, N, N, 1.0, A, N, B, N, 1.0, C, N);
+    cblas_sgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, N, N, N, 1.0, A, N, B, N, 1.0, C, N);
 #else
     cblas_dgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, N, N, N, 1.0, A, N, B, N, 1.0, C, N);
 #endif

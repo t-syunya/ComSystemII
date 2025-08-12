@@ -26,6 +26,28 @@ print_error() {
     echo -e "\033[1;31m✗ $1\033[0m"
 }
 
+# 問題の診断
+diagnose_issues() {
+    print_header "問題の診断"
+    
+    # 1. defineの状態を確認
+    print_info "現在のdefineの状態を確認中..."
+    echo "UNROLL_ONLY: $(grep -c '^#define UNROLL_ONLY' gemm-test.c || echo '0')"
+    echo "UNROLL_OPTIMIZED: $(grep -c '^#define UNROLL_OPTIMIZED' gemm-test.c || echo '0')"
+    echo "BLOCKING_UNROLL: $(grep -c '^#define BLOCKING_UNROLL' gemm-test.c || echo '0')"
+    echo "OMP_UNROLL: $(grep -c '^#define OMP_UNROLL' gemm-test.c || echo '0')"
+    
+    # 2. 関数の存在確認
+    print_info "ループアンローリング関数の存在確認中..."
+    echo "dgemm_unroll: $(grep -c 'void dgemm_unroll' gemm-test.c || echo '0')"
+    echo "dgemm_unroll_optimized: $(grep -c 'void dgemm_unroll_optimized' gemm-test.c || echo '0')"
+    
+    # 3. main関数のテストコード確認
+    print_info "main関数のテストコード確認中..."
+    echo "UNROLL_ONLY test block: $(grep -c '#ifdef UNROLL_ONLY' gemm-test.c || echo '0')"
+    echo "UNROLL_OPTIMIZED test block: $(grep -c '#ifdef UNROLL_OPTIMIZED' gemm-test.c || echo '0')"
+}
+
 # 問題の修正
 fix_issues() {
     print_header "問題の修正"
@@ -41,14 +63,16 @@ fix_issues() {
     print_info "重複関数を削除しています..."
     
     # dgemm_blocking_unrollの重複を削除
-    if grep -n "void dgemm_blocking_unroll" gemm-test.c | wc -l | grep -q "2"; then
+    local blocking_count=$(grep -c "void dgemm_blocking_unroll" gemm-test.c || echo "0")
+    if [ "$blocking_count" -eq 2 ]; then
         # 2つ目の定義を削除
         sed -i '/^void dgemm_blocking_unroll(REAL \*A, REAL \*B, REAL \*C, int n)$/,/^}$/d' gemm-test.c
         print_success "重複するdgemm_blocking_unroll関数を削除しました"
     fi
     
     # dgemm_OMP_unrollの重複を削除
-    if grep -n "void dgemm_OMP_unroll" gemm-test.c | wc -l | grep -q "2"; then
+    local omp_count=$(grep -c "void dgemm_OMP_unroll" gemm-test.c || echo "0")
+    if [ "$omp_count" -eq 2 ]; then
         # 2つ目の定義を削除
         sed -i '/^void dgemm_OMP_unroll(REAL \*A, REAL \*B, REAL \*C, int n)$/,/^}$/d' gemm-test.c
         print_success "重複するdgemm_OMP_unroll関数を削除しました"
@@ -186,6 +210,7 @@ run_unroll_tests() {
     sed -i 's|//#define UNROLL_ONLY|#define UNROLL_ONLY|' gemm-test.c
     make clean
     make
+    echo "=== 修正版ループアンローリングテスト ==="
     make run
     sed -i 's|#define UNROLL_ONLY|//#define UNROLL_ONLY|' gemm-test.c
     
@@ -194,6 +219,7 @@ run_unroll_tests() {
     sed -i 's|//#define UNROLL_OPTIMIZED|#define UNROLL_OPTIMIZED|' gemm-test.c
     make clean
     make
+    echo "=== 最適化版ループアンローリングテスト ==="
     make run
     sed -i 's|#define UNROLL_OPTIMIZED|//#define UNROLL_OPTIMIZED|' gemm-test.c
     
@@ -202,6 +228,7 @@ run_unroll_tests() {
     sed -i 's|//#define BLOCKING_UNROLL|#define BLOCKING_UNROLL|' gemm-test.c
     make clean
     make
+    echo "=== ブロッキング + ループアンローリングテスト ==="
     make run
     sed -i 's|#define BLOCKING_UNROLL|//#define BLOCKING_UNROLL|' gemm-test.c
     
@@ -215,6 +242,7 @@ run_unroll_tests() {
     for threads in 1 2 4 8; do
         print_info "OpenMP + ループアンローリング スレッド数: $threads"
         export OMP_NUM_THREADS=$threads
+        echo "=== OpenMP + ループアンローリング スレッド数: $threads ==="
         make run
     done
     
@@ -242,42 +270,74 @@ run_mkl_test() {
 
 # 結果の整理
 organize_results() {
+    local log_file="$1"
     print_header "結果の整理"
+    
+    print_info "ログファイル: $log_file"
     
     print_info "以下のコマンドで結果を確認できます："
     echo ""
     echo "1. 最高性能の組み合わせを確認:"
-    echo "   grep 'GFLOPS' /dev/stdout | sort -k3 -nr | head -10"
+    echo "   grep 'GFLOPS' $log_file | sort -k3 -nr | head -10"
     echo ""
     echo "2. 各最適化技法の効果を比較:"
-    echo "   grep 'unoptimized\|blocking\|AVX2\|OpenMP\|MKL\|Unroll\|Loop Unrolling' /dev/stdout"
+    echo "   grep 'unoptimized\|blocking\|AVX2\|OpenMP\|MKL\|Unroll\|Loop Unrolling' $log_file"
     echo ""
     echo "3. 性能向上率の計算:"
     echo "   基本性能と最高性能を比較して計算してください"
+    echo ""
+    echo "4. 全結果の表示:"
+    echo "   cat $log_file"
+    
+    # 実際に結果を集計して表示
+    print_info "=== 結果集計 ==="
+    echo ""
+    echo "最高性能トップ10:"
+    grep 'GFLOPS' "$log_file" | sort -k3 -nr | head -10
+    echo ""
+    echo "各最適化技法の平均性能:"
+    echo "unoptimized: $(grep 'unoptimized' "$log_file" | awk '{sum+=$3; count++} END {print sum/count " GFLOPS"}')"
+    echo "loop exchange: $(grep 'loop exchange' "$log_file" | awk '{sum+=$3; count++} END {print sum/count " GFLOPS"}')"
+    echo "blocking: $(grep 'blocking' "$log_file" | awk '{sum+=$3; count++} END {print sum/count " GFLOPS"}')"
+    echo "AVX2: $(grep 'AVX2' "$log_file" | awk '{sum+=$3; count++} END {print sum/count " GFLOPS"}')"
+    echo "OpenMP: $(grep 'OpenMP' "$log_file" | awk '{sum+=$3; count++} END {print sum/count " GFLOPS"}')"
+    echo "MKL: $(grep 'MKL' "$log_file" | awk '{sum+=$3; count++} END {print sum/count " GFLOPS"}')"
+    echo "Loop Unrolling: $(grep 'Loop Unrolling' "$log_file" | awk '{sum+=$3; count++} END {print sum/count " GFLOPS"}')"
 }
 
 # メイン実行
 main() {
     print_header "問題修正とテスト実行"
     
+    # ログファイル名を設定
+    local log_file="optimization_results_$(date +%Y%m%d_%H%M%S).log"
+    
+    # 問題の診断
+    diagnose_issues
+    
     # 問題の修正
     fix_issues
     
-    # 各テストの実行
-    run_basic_test
-    run_blocking_tests
-    run_avx2_test
-    run_openmp_tests
-    run_avx2_openmp_tests
-    run_unroll_tests
-    run_mkl_test
+    print_info "テスト結果をログファイルに保存します: $log_file"
+    
+    # 各テストの実行（ログに保存）
+    {
+        run_basic_test
+        run_blocking_tests
+        run_avx2_test
+        run_openmp_tests
+        run_avx2_openmp_tests
+        run_unroll_tests
+        run_mkl_test
+    } 2>&1 | tee "$log_file"
     
     # 結果の整理
-    organize_results
+    organize_results "$log_file"
     
     print_header "テスト完了"
     print_success "全てのテストが完了しました"
     print_info "結果を確認して最高性能の組み合わせを特定してください"
+    print_info "ログファイル: $log_file"
 }
 
 # ヘルプ表示
