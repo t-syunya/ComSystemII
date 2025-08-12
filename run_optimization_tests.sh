@@ -62,6 +62,7 @@ fix_issues() {
     sed -i 's|#define AVX_OMP|//#define AVX_OMP|' gemm-test.c
     sed -i 's|#define MKL|//#define MKL|' gemm-test.c
     sed -i 's|#define UNROLL_ONLY|//#define UNROLL_ONLY|' gemm-test.c
+    sed -i 's|#define UNROLL_OPTIMIZED|//#define UNROLL_OPTIMIZED|' gemm-test.c
     sed -i 's|#define BLOCKING_UNROLL|//#define BLOCKING_UNROLL|' gemm-test.c
     sed -i 's|#define OMP_UNROLL|//#define OMP_UNROLL|' gemm-test.c
     print_success "全てのdefineを無効化しました"
@@ -180,13 +181,21 @@ run_avx2_openmp_tests() {
 run_unroll_tests() {
     print_header "ループアンローリングテスト"
     
-    # 基本的なループアンローリング
-    print_info "基本的なループアンローリングテスト"
+    # 修正版ループアンローリング
+    print_info "修正版ループアンローリングテスト"
     sed -i 's|//#define UNROLL_ONLY|#define UNROLL_ONLY|' gemm-test.c
     make clean
     make
     make run
     sed -i 's|#define UNROLL_ONLY|//#define UNROLL_ONLY|' gemm-test.c
+    
+    # 最適化版ループアンローリング
+    print_info "最適化版ループアンローリングテスト"
+    sed -i 's|//#define UNROLL_OPTIMIZED|#define UNROLL_OPTIMIZED|' gemm-test.c
+    make clean
+    make
+    make run
+    sed -i 's|#define UNROLL_OPTIMIZED|//#define UNROLL_OPTIMIZED|' gemm-test.c
     
     # ブロッキング + ループアンローリング
     print_info "ブロッキング + ループアンローリングテスト"
@@ -241,7 +250,7 @@ organize_results() {
     echo "   grep 'GFLOPS' /dev/stdout | sort -k3 -nr | head -10"
     echo ""
     echo "2. 各最適化技法の効果を比較:"
-    echo "   grep 'unoptimized\|blocking\|AVX2\|OpenMP\|MKL\|Unroll' /dev/stdout"
+    echo "   grep 'unoptimized\|blocking\|AVX2\|OpenMP\|MKL\|Unroll\|Loop Unrolling' /dev/stdout"
     echo ""
     echo "3. 性能向上率の計算:"
     echo "   基本性能と最高性能を比較して計算してください"
