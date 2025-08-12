@@ -51,28 +51,65 @@ add_unroll_function() {
     
     # ループアンローリング関数を挿入
     cat > temp_unroll_function.c << 'EOF'
-/* Loop Unrolling */
+/* Loop Unrolling - 修正版（列優先アクセス） */
 void dgemm_unroll(REAL *A, REAL *B, REAL *C, int n)
 {
   int i, j, k;
-  REAL cij;
   int unroll_factor = UNROLL;
-
-  for (i = 0; i < n; i++)
-    for (j = 0; j < n; j++)
+  
+  // 初期化
+  for (i = 0; i < n * n; i++)
+    C[i] = 0.0;
+  
+  // 列優先アクセスパターン（正しい実装）
+  for (j = 0; j < n; j++)
+    for (k = 0; k < n; k++)
     {
-      cij = C[i + j * n];
-      for (k = 0; k < n - unroll_factor + 1; k += unroll_factor)
+      REAL bkj = B[k + j * n];  // B[k][j]を一度読み込み
+      // アンロール可能な部分
+      for (i = 0; i <= n - unroll_factor; i += unroll_factor)
       {
-        cij += A[i + k * n] * B[k + j * n];
-        cij += A[i + (k+1) * n] * B[(k+1) + j * n];
-        cij += A[i + (k+2) * n] * B[(k+2) + j * n];
-        cij += A[i + (k+3) * n] * B[(k+3) + j * n];
+        C[i + j * n] += A[i + k * n] * bkj;
+        C[(i+1) + j * n] += A[(i+1) + k * n] * bkj;
+        C[(i+2) + j * n] += A[(i+2) + k * n] * bkj;
+        C[(i+3) + j * n] += A[(i+3) + k * n] * bkj;
       }
       // 残りの要素を処理
-      for (; k < n; k++)
-        cij += A[i + k * n] * B[k + j * n];
-      C[i + j * n] = cij;
+      for (; i < n; i++)
+        C[i + j * n] += A[i + k * n] * bkj;
+    }
+}
+
+/* より効率的なループアンローリング（キャッシュ最適化版） */
+void dgemm_unroll_optimized(REAL *A, REAL *B, REAL *C, int n)
+{
+  int i, j, k;
+  int unroll_factor = UNROLL;
+  
+  // 初期化
+  for (i = 0; i < n * n; i++)
+    C[i] = 0.0;
+  
+  // 列優先アクセスパターン（最適化版）
+  for (j = 0; j < n; j++)
+    for (k = 0; k < n; k++)
+    {
+      REAL bkj = B[k + j * n];  // B[k][j]を一度読み込み
+      // アンロール可能な部分（より大きなアンロール係数）
+      for (i = 0; i <= n - 8; i += 8)
+      {
+        C[i + j * n] += A[i + k * n] * bkj;
+        C[(i+1) + j * n] += A[(i+1) + k * n] * bkj;
+        C[(i+2) + j * n] += A[(i+2) + k * n] * bkj;
+        C[(i+3) + j * n] += A[(i+3) + k * n] * bkj;
+        C[(i+4) + j * n] += A[(i+4) + k * n] * bkj;
+        C[(i+5) + j * n] += A[(i+5) + k * n] * bkj;
+        C[(i+6) + j * n] += A[(i+6) + k * n] * bkj;
+        C[(i+7) + j * n] += A[(i+7) + k * n] * bkj;
+      }
+      // 残りの要素を処理
+      for (; i < n; i++)
+        C[i + j * n] += A[i + k * n] * bkj;
     }
 }
 
@@ -158,7 +195,8 @@ add_defines() {
     
     # 既存のdefine文の後に追加
     sed -i '/\/\/#define AVX_OMP/a\
-\/\/#define UNROLL_ONLY                   \/\* Loop Unrolling -> ON *\/\
+\/\/#define UNROLL_ONLY                   \/\* Loop Unrolling (Fixed) -> ON *\/\
+\/\/#define UNROLL_OPTIMIZED              \/\* Loop Unrolling (Optimized) -> ON *\/\
 \/\/#define BLOCKING_UNROLL               \/\* Blocking + Loop Unrolling -> ON *\/\
 \/\/#define OMP_UNROLL                    \/\* OpenMP + Loop Unrolling -> ON *\/' gemm-test.c
     
@@ -173,14 +211,25 @@ add_main_tests() {
     local mkl_end=$(grep -n "#endif" gemm-test.c | tail -1 | cut -d: -f1)
     
     cat > temp_main_tests.c << 'EOF'
-    /*Loop Unrolling */
+    /*Loop Unrolling - 修正版 */
 #ifdef UNROLL_ONLY
     int_mat(A, B, C, N);
     t = seconds();
     dgemm_unroll(A, B, C, N);
     t = seconds() - t;
     check_mat(C, C_unopt, N);
-    printf("%f [s]  GFLOPS %f  |Loop Unrolling|\n", t,
+    printf("%f [s]  GFLOPS %f  |Loop Unrolling (Fixed)|\n", t,
+           (float)N * N * N * 2 / t / 1000 / 1000 / 1000);
+#endif
+
+    /*Loop Unrolling - 最適化版 */
+#ifdef UNROLL_OPTIMIZED
+    int_mat(A, B, C, N);
+    t = seconds();
+    dgemm_unroll_optimized(A, B, C, N);
+    t = seconds() - t;
+    check_mat(C, C_unopt, N);
+    printf("%f [s]  GFLOPS %f  |Loop Unrolling (Optimized)|\n", t,
            (float)N * N * N * 2 / t / 1000 / 1000 / 1000);
 #endif
 
@@ -222,7 +271,7 @@ verify_implementation() {
     print_info "実装の確認中..."
     
     # 必要な関数が存在するかチェック
-    local functions=("dgemm_unroll" "dgemm_blocking_unroll" "dgemm_OMP_unroll")
+    local functions=("dgemm_unroll" "dgemm_unroll_optimized" "dgemm_blocking_unroll" "dgemm_OMP_unroll")
     local missing_functions=()
     
     for func in "${functions[@]}"; do
@@ -289,7 +338,8 @@ main() {
     print_header "実装完了"
     print_success "ループアンローリングの実装が完了しました"
     print_info "以下のdefine文を使用してテストできます："
-    echo "  #define UNROLL_ONLY        // ループアンローリングのみ"
+    echo "  #define UNROLL_ONLY        // ループアンローリング（修正版）"
+    echo "  #define UNROLL_OPTIMIZED   // ループアンローリング（最適化版）"
     echo "  #define BLOCKING_UNROLL    // ブロッキング + ループアンローリング"
     echo "  #define OMP_UNROLL         // OpenMP + ループアンローリング"
 }
@@ -301,7 +351,8 @@ show_help() {
     echo "このスクリプトはgemm-test.cにループアンローリング機能を追加します"
     echo ""
     echo "追加される機能:"
-    echo "  - dgemm_unroll: 基本的なループアンローリング"
+    echo "  - dgemm_unroll: ループアンローリング（修正版）"
+    echo "  - dgemm_unroll_optimized: ループアンローリング（最適化版）"
     echo "  - dgemm_blocking_unroll: ブロッキング + ループアンローリング"
     echo "  - dgemm_OMP_unroll: OpenMP + ループアンローリング"
     echo ""
