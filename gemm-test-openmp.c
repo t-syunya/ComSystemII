@@ -120,13 +120,19 @@ void dgemm_AVX2(REAL *A, REAL *B, REAL *C, int n)
 void dgemm_OMP(REAL *A, REAL *B, REAL *C, int n)
 {
   int i, j, k;
-  for (i = 0; i < n * n; i++)
-    C[i] = 0.0;
-#pragma omp parallel for private(j, k)
+  REAL cij;
+
+#pragma omp parallel for
   for (i = 0; i < n; i++)
+  {
     for (j = 0; j < n; j++)
+    {
+      cij = C[i + j * n]; /* cij = C[i][j] */
       for (k = 0; k < n; k++)
-        C[i + j * n] += A[i + k * n] * B[k + j * n];
+        cij += A[i + k * n] * B[k + j * n]; /* cij+=A[i][k]*B[k][j] */
+      C[i + j * n] = cij;                   /* C[i][j] = cij */
+    }
+  }
 }
 
 /* AVX + OpenMP */

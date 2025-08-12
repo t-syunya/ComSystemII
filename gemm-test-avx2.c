@@ -8,15 +8,15 @@
 #define BLOCKSIZE 32
 
 // AVX2最適化のみ有効化
-//#define BLOCKING
+// #define BLOCKING
 #define AVX2
-//#define OMP
-//#define AVX_OMP
-//#define MKL
-//#define UNROLL_ONLY
-//#define UNROLL_OPTIMIZED
-//#define BLOCKING_UNROLL
-//#define OMP_UNROLL
+// #define OMP
+// #define AVX_OMP
+// #define MKL
+// #define UNROLL_ONLY
+// #define UNROLL_OPTIMIZED
+// #define BLOCKING_UNROLL
+// #define OMP_UNROLL
 
 #ifdef MKL
 #include <mkl.h>
@@ -84,15 +84,15 @@ void dgemm_AVX2(REAL *A, REAL *B, REAL *C, int n)
   {
     for (j = 0; j < n; j++)
     {
-      __m256 c0 = _mm256_loadu_ps(C + i + j * n);
+      __m256 c0 = _mm256_load_ps(C + i + j * n);
 
       for (k = 0; k < n; k++)
         c0 =
             _mm256_add_ps(c0,
-                          _mm256_mul_ps(_mm256_loadu_ps(A + i + k * n),
+                          _mm256_mul_ps(_mm256_load_ps(A + i + k * n),
                                         _mm256_broadcast_ss(B + k +
                                                             j * n)));
-      _mm256_storeu_ps(C + i + j * n, c0);
+      _mm256_store_ps(C + i + j * n, c0);
     }
   }
 #else
@@ -100,15 +100,15 @@ void dgemm_AVX2(REAL *A, REAL *B, REAL *C, int n)
   {
     for (j = 0; j < n; j++)
     {
-      __m256d c0 = _mm256_loadu_pd(C + i + j * n);
+      __m256d c0 = _mm256_load_pd(C + i + j * n);
 
       for (k = 0; k < n; k++)
         c0 =
             _mm256_add_pd(c0,
-                          _mm256_mul_pd(_mm256_loadu_pd(A + i + k * n),
+                          _mm256_mul_pd(_mm256_load_pd(A + i + k * n),
                                         _mm256_broadcast_sd(B + k +
                                                             j * n)));
-      _mm256_storeu_pd(C + i + j * n, c0);
+      _mm256_store_pd(C + i + j * n, c0);
     }
   }
 #endif
@@ -137,15 +137,16 @@ void dgemm_AVX_OMP(REAL *A, REAL *B, REAL *C, int n)
   {
     for (j = 0; j < n; j++)
     {
-      __m256 c0 = _mm256_loadu_ps(C + i + j * n);
+      __m256 c0 = _mm256_load_ps(C + i + j * n); /* cij = C[i+j*n]] */
 
       for (k = 0; k < n; k++)
         c0 =
             _mm256_add_ps(c0,
-                          _mm256_mul_ps(_mm256_loadu_ps(A + i + k * n),
+                          _mm256_mul_ps(_mm256_load_ps(A + i + k * n),
                                         _mm256_broadcast_ss(B + k +
                                                             j * n)));
-      _mm256_storeu_ps(C + i + j * n, c0);
+      /* cij += A[i+k*n] * B[k+j*n] */
+      _mm256_store_ps(C + i + j * n, c0); /* C[i+j*n] = cij */
     }
   }
 #else
@@ -153,15 +154,16 @@ void dgemm_AVX_OMP(REAL *A, REAL *B, REAL *C, int n)
   {
     for (j = 0; j < n; j++)
     {
-      __m256d c0 = _mm256_loadu_pd(C + i + j * n);
+      __m256d c0 = _mm256_load_pd(C + i + j * n); /* cij = C[i+j*n]] */
 
       for (k = 0; k < n; k++)
         c0 =
             _mm256_add_pd(c0,
-                          _mm256_mul_pd(_mm256_loadu_pd(A + i + k * n),
+                          _mm256_mul_pd(_mm256_load_pd(A + i + k * n),
                                         _mm256_broadcast_sd(B + k +
                                                             j * n)));
-      _mm256_storeu_pd(C + i + j * n, c0);
+      /* cij += A[i+k*n] * B[k+j*n] */
+      _mm256_store_pd(C + i + j * n, c0); /* C[i+j*n] = cij */
     }
   }
 #endif
@@ -241,11 +243,12 @@ void do_block_unroll(int n, int si, int sj, int sk, REAL *A, REAL *B, REAL *C)
       for (k = sk; k < sk + BLOCKSIZE - unroll_factor + 1; k += unroll_factor)
       {
         C[i + j * n] += A[i + k * n] * B[k + j * n];
-        C[i + j * n] += A[i + (k+1) * n] * B[(k+1) + j * n];
-        C[i + j * n] += A[i + (k+2) * n] * B[(k+2) + j * n];
-        C[i + j * n] += A[i + (k+3) * n] * B[(k+3) + j * n];
+        C[i + j * n] += A[i + (k + 1) * n] * B[(k + 1) + j * n];
+        C[i + j * n] += A[i + (k + 2) * n] * B[(k + 2) + j * n];
+        C[i + j * n] += A[i + (k + 3) * n] * B[(k + 3) + j * n];
       }
-      for (; k < sk + BLOCKSIZE; k++) C[i + j * n] += A[i + k * n] * B[k + j * n];
+      for (; k < sk + BLOCKSIZE; k++)
+        C[i + j * n] += A[i + k * n] * B[k + j * n];
     }
   }
 }
@@ -264,8 +267,9 @@ void dgemm_OMP_unroll(REAL *A, REAL *B, REAL *C, int n)
 {
   int i, j, k;
   int unroll_factor = 4;
-  for (i = 0; i < n * n; i++) C[i] = 0.0;
-#pragma omp parallel for private(j,k)
+  for (i = 0; i < n * n; i++)
+    C[i] = 0.0;
+#pragma omp parallel for private(j, k)
   for (i = 0; i < n; i++)
   {
     for (j = 0; j < n; j++)
@@ -273,11 +277,12 @@ void dgemm_OMP_unroll(REAL *A, REAL *B, REAL *C, int n)
       for (k = 0; k <= n - unroll_factor; k += unroll_factor)
       {
         C[i + j * n] += A[i + k * n] * B[k + j * n];
-        C[i + j * n] += A[i + (k+1) * n] * B[(k+1) + j * n];
-        C[i + j * n] += A[i + (k+2) * n] * B[(k+2) + j * n];
-        C[i + j * n] += A[i + (k+3) * n] * B[(k+3) + j * n];
+        C[i + j * n] += A[i + (k + 1) * n] * B[(k + 1) + j * n];
+        C[i + j * n] += A[i + (k + 2) * n] * B[(k + 2) + j * n];
+        C[i + j * n] += A[i + (k + 3) * n] * B[(k + 3) + j * n];
       }
-      for (; k < n; k++) C[i + j * n] += A[i + k * n] * B[k + j * n];
+      for (; k < n; k++)
+        C[i + j * n] += A[i + k * n] * B[k + j * n];
     }
   }
 }
