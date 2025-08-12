@@ -1,0 +1,78 @@
+CC = icc
+CFLAGS = -qopenmp -O3 -xCORE-AVX512 -g
+LDFLAGS = -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread -lm
+
+# ターゲット
+TARGETS = gemm-test-basic gemm-test-blocking gemm-test-avx2 gemm-test-openmp gemm-test-mkl gemm-test-unroll
+
+# デフォルトターゲット
+all: $(TARGETS)
+
+# 基本版（最適化なし）
+gemm-test-basic: gemm-test-basic.c
+	$(CC) $(CFLAGS) -o $@ $< $(LDFLAGS)
+
+# ブロッキング版
+gemm-test-blocking: gemm-test-blocking.c
+	$(CC) $(CFLAGS) -o $@ $< $(LDFLAGS)
+
+# AVX2版
+gemm-test-avx2: gemm-test-avx2.c
+	$(CC) $(CFLAGS) -o $@ $< $(LDFLAGS)
+
+# OpenMP版
+gemm-test-openmp: gemm-test-openmp.c
+	$(CC) $(CFLAGS) -o $@ $< $(LDFLAGS)
+
+# MKL版
+gemm-test-mkl: gemm-test-mkl.c
+	$(CC) $(CFLAGS) -o $@ $< $(LDFLAGS)
+
+# ループアンローリング版
+gemm-test-unroll: gemm-test-unroll.c
+	$(CC) $(CFLAGS) -o $@ $< $(LDFLAGS)
+
+# クリーン
+clean:
+	rm -f $(TARGETS) *.o
+
+# 実行用ターゲット
+run-basic: gemm-test-basic
+	taskset -c 0-3 ./$< 960 10
+
+run-blocking: gemm-test-blocking
+	taskset -c 0-3 ./$< 960 10
+
+run-avx2: gemm-test-avx2
+	taskset -c 0-3 ./$< 960 10
+
+run-openmp: gemm-test-openmp
+	taskset -c 0-3 ./$< 960 10
+
+run-mkl: gemm-test-mkl
+	taskset -c 0-3 ./$< 960 10
+
+run-unroll: gemm-test-unroll
+	taskset -c 0-3 ./$< 960 10
+
+# 全テスト実行
+test-all: $(TARGETS)
+	@echo "=== 基本版テスト ==="
+	@$(MAKE) run-basic
+	@echo ""
+	@echo "=== ブロッキング版テスト ==="
+	@$(MAKE) run-blocking
+	@echo ""
+	@echo "=== AVX2版テスト ==="
+	@$(MAKE) run-avx2
+	@echo ""
+	@echo "=== OpenMP版テスト ==="
+	@$(MAKE) run-openmp
+	@echo ""
+	@echo "=== MKL版テスト ==="
+	@$(MAKE) run-mkl
+	@echo ""
+	@echo "=== ループアンローリング版テスト ==="
+	@$(MAKE) run-unroll
+
+.PHONY: all clean run-basic run-blocking run-avx2 run-openmp run-mkl run-unroll test-all
